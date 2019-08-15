@@ -42,6 +42,8 @@ resource "aws_route_table" "public-rt" {
     }
 }
 
+
+
 ## Associate Public-Route table to Public Subnet
 resource "aws_route_table_association" "public-assoc" {
 
@@ -49,3 +51,80 @@ resource "aws_route_table_association" "public-assoc" {
     route_table_id              = "${aws_route_table.public-rt.id}"
 }
 
+resource "aws_security_group" "allow_http" {
+  name        = "allow_http"
+  description = "Allow http inbound traffic"
+  vpc_id      = "${aws_vpc.main_vpc.id}"
+
+  ingress {
+    # HTTP (change to whatever ports you need)
+    from_port   = 80
+    to_port     = 80
+    protocol    = "-1"
+    # Please restrict your ingress to only necessary IPs and ports.
+    # Opening to 0.0.0.0/0 can lead to security vulnerabilities.
+    cidr_blocks = ["0.0.0.0/0"]# add a CIDR block here
+  }
+
+  egress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
+  }
+}
+
+## Make Dynamic SSH keys
+resource "null_resource" "make-ssh-keys" {
+    provisioner "local-exec" {
+        command                 = "ssh-keygen -q -t rsa -f wikimedia -N ''"
+    }
+
+}
+module "pem_content" {
+  source                        = "matti/outputs/shell"
+  command                       = "cat wikimedia"
+}
+
+### Get PUB Content
+module "pub_content" {
+  source                        = "matti/outputs/shell"
+  command                       = "cat wikimedia.pub"
+}
+
+resource "aws_key_pair" "wikimedia" {
+  key_name                      = "wikimedia-key"
+  public_key                    = "${module.pub_content.stdout}"
+}
+
+
+resource "aws_instance" "web" {
+  count                         = 1
+  ami                           = "ami-0015b9ef68c77328d"
+  instance_type                 = "t2.small"
+  key_name                      = "${aws_key_pair.wikimedia.key_name}"
+  vpc_security_group_ids        = ["${aws_security_group.allow_http.id}"]
+  subnet_id                     = "${aws_subnet.public-subnets.id}"
+
+  tags                          = {
+      Name                      = "${var.app_name}-node"
+  }
+
+  provisioner "remote-exec" {
+    connection {
+      type                      = "ssh"
+      user                      = "centos"
+      private_key               = "${file("wikimedia")}"
+      host                      = "${aws_instance.web.*.public_ip}"
+
+    }
+
+    inline                      = [
+      "sudo yum upgrade -y",
+      "sudo curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl) && sudo chmod 755 kubectl && sudo mv kubectl /bin/",
+      "curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 && chmod +x minikube && sudo mv minikube /bin/",
+      "minikube start --vm-driver=none"
+    ]
+  }
+
+}
