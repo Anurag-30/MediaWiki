@@ -1,0 +1,23 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: wikimedia-deployment
+  labels:
+    app: wikimedia
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: wikimedia
+        type: web
+    spec:
+      containers:
+        - name: wikimedia
+          image: wikimedia/final
+          ports:
+            - containerPort: 80
+              name: httpd-port
+      envFrom:
+        - secretRef:
+            name: mariadb-env
