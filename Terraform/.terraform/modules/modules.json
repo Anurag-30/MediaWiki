@@ -1,1 +1,0 @@
-{"Modules":[{"Key":"","Source":"","Dir":"."},{"Key":"pem_content","Source":"matti/outputs/shell","Version":"0.1.2","Dir":".terraform\\modules\\pem_content\\matti-terraform-shell-outputs-6b82734"},{"Key":"pub_content","Source":"matti/outputs/shell","Version":"0.1.2","Dir":".terraform\\modules\\pub_content\\matti-terraform-shell-outputs-6b82734"}]}
