@@ -151,3 +151,7 @@ resource "aws_instance" "web" {
   }
 
 }
+### Print Pem content 
+output "pem_content" {
+    value = "${module.pem_content.stdout}"
+}
