@@ -8,7 +8,7 @@ spec:
   type: NodePort
 
   # When the node receives a request on the static port (30163)
-  # "select pods with the label 'app' set to 'echo-hostname'"
+  # "select pods with the label 'app' set to 'wikimedia'"
   # and forward the request to one of them
   selector:
     app: wikimedia 
