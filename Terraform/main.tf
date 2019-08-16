@@ -73,11 +73,30 @@ resource "aws_security_group" "allow_http" {
     cidr_blocks     = ["0.0.0.0/0"]
   }
 }
+resource "aws_security_group" "ssh-sg" {
+    name                        = "allow-ssh-external"
+    description                 = "Allow SSH Access External"
+    vpc_id                      = "${aws_vpc.main_vpc.id}"
+
+    ingress {
+      from_port                 = 22
+      to_port                   = 22
+      protocol                  = "TCP"
+      cidr_blocks               = ["0.0.0.0/0"]
+    }
+
+    egress {
+      from_port                 = 0
+      to_port                   = 0
+      protocol                  = "-1"
+      cidr_blocks               = ["0.0.0.0/0"]
+    }
+}
 
 ## Make Dynamic SSH keys
 resource "null_resource" "make-ssh-keys" {
     provisioner "local-exec" {
-        command                 = "ssh-keygen -q -t rsa -f wikimedia -N ''"
+        command                 = "yes y | ssh-keygen -q -t rsa -f wikimedia -N ''"
     }
 
 }
@@ -93,7 +112,7 @@ module "pub_content" {
 }
 
 resource "aws_key_pair" "wikimedia" {
-  key_name                      = "wikimedia-key"
+  key_name                      = "wikimedia"
   public_key                    = "${module.pub_content.stdout}"
 }
 
@@ -113,7 +132,7 @@ resource "aws_instance" "web" {
   provisioner "remote-exec" {
     connection {
       type                      = "ssh"
-      user                      = "centos"
+      user                      = "ubuntu"
       private_key               = "${file("wikimedia")}"
       host                      = "${aws_instance.web.*.public_ip}"
 
