@@ -60,7 +60,7 @@ resource "aws_security_group" "allow_http" {
     # HTTP (change to whatever ports you need)
     from_port   = 80
     to_port     = 80
-    protocol    = ""
+    protocol    = "TCP"
     # Please restrict your ingress to only necessary IPs and ports.
     # Opening to 0.0.0.0/0 can lead to security vulnerabilities.
     cidr_blocks = ["0.0.0.0/0"]# add a CIDR block here
@@ -93,6 +93,27 @@ resource "aws_security_group" "ssh-sg" {
     }
 }
 
+resource "aws_security_group" "nodeport" {
+    name                        = "allow-service"
+    description                 = "Allow the service to be accessed"
+    vpc_id                      = "${aws_vpc.main_vpc.id}"
+
+    ingress {
+      from_port                 = 30163
+      to_port                   = 30163
+      protocol                  = "UDP"
+      cidr_blocks               = ["0.0.0.0/0"]
+    }
+
+    egress {
+      from_port                 = 0
+      to_port                   = 0
+      protocol                  = "-1"
+      cidr_blocks               = ["0.0.0.0/0"]
+    }
+}
+
+
 ## Make Dynamic SSH keys
 resource "null_resource" "make-ssh-keys" {
     provisioner "local-exec" {
@@ -122,7 +143,7 @@ resource "aws_instance" "web" {
   ami                           = "ami-07d0cf3af28718ef8"
   instance_type                 = "t2.large"
   key_name                      = "${aws_key_pair.wikimedia.key_name}"
-  vpc_security_group_ids        = ["${aws_security_group.allow_http.id}"]
+  vpc_security_group_ids        = ["${aws_security_group.allow_http.id}","${aws_security_group.ssh-sg.id}","${aws_security_group.nodeport.id}"]
   subnet_id                     = "${aws_subnet.public-subnets.id}"
 
   tags                          = {
