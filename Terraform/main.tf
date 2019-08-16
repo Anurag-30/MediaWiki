@@ -145,7 +145,7 @@ resource "aws_instance" "web" {
       "sudo minikube start --vm-driver=none",
       "sleep 30",
       "sudo apt-get install git -y",
-      "sudo git clone https://github.com/Anurag-30/MediaWiki.git && cd MediaWiki && cd kubernetes && kubectl create -f secrets.yml -f deployment.yml -f web-service.yaml"
+      "sudo git clone https://github.com/Anurag-30/MediaWiki.git && cd MediaWiki && cd kubernetes && sudo kubectl create -f secrets.yml -f deployment.yml -f web-service.yaml"
 
     ]
   }
