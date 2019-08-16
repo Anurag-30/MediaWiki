@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: wikimedia
-          image: wikimedia/final
+          image: imanurag30/wikimedia
           ports:
             - containerPort: 80
               name: httpd-port
