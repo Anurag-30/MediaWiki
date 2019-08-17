@@ -40,4 +40,4 @@ terraform apply
 ```
 Need to specify the region at the run time eg:us-east-1.
 
-You will get the ssh key into wikimedia file. You can access the application at http://{publicip}:30163/wiki
+You will get the ssh key into wikimedia file with which you can login into the ec2 machine that has been launched. You can access the application at http://{publicip}:30163/wiki
