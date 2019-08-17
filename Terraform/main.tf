@@ -149,7 +149,9 @@ resource "aws_instance" "web" {
   tags                          = {
       Name                      = "${var.app_name}-node"
   }
-
+  root_block_device {
+  volume_size = "50"
+    }
   provisioner "remote-exec" {
     connection {
       type                      = "ssh"
@@ -161,12 +163,14 @@ resource "aws_instance" "web" {
 
     inline                      = [
       "sudo apt-get update && sudo apt-get install docker.io -y",
+      "sudo mkdir /mnt/data && chmod 644 /mnt/data",
       "sudo curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && sudo chmod 755 ./kubectl && sudo mv ./kubectl /usr/local/bin/kubectl",
       "curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/",
       "sudo minikube start --vm-driver=none",
       "sleep 30",
       "sudo apt-get install git -y",
-      "sudo git clone https://github.com/Anurag-30/MediaWiki.git && cd MediaWiki && cd kubernetes && sudo kubectl create -f secrets.yaml -f mariadb-deployment.yaml -f mariadb-svc.yaml",
+      "sudo git clone https://github.com/Anurag-30/MediaWiki.git && cd MediaWiki && cd kubernetes && sudo kubectl create -f secrets.yaml -f persistent-volumes.yaml",
+      "sudo kubectl create  -f mariadb-deployment.yaml -f mariadb-svc.yaml",
       "sudo kubectl create -f app-deployment.yaml -f web-service.yaml"
 
     ]

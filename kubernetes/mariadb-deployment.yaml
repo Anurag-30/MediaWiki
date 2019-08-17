@@ -40,3 +40,10 @@ spec:
                 secretKeyRef:
                   name: mariadb-secret
                   key: dbrootpassword
+          volumeMounts:
+          - name: wordpress-persistent-storage
+            mountPath: /var/lib/mysql
+      volumes:
+      - name: wordpress-persistent-storage
+        persistentVolumeClaim:
+          claimName: mariadb-pvc
