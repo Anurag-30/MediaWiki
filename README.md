@@ -28,7 +28,7 @@ git clone https://github.com/Anurag-30/MediaWiki.git
 2. Move into Terraform directory
 
 ```
-cd cd MediaWiki/Terraform/
+cd MediaWiki/Terraform/
 
 ```
 
@@ -38,6 +38,6 @@ cd cd MediaWiki/Terraform/
 terraform apply
 
 ```
-Need to specify the region eg:us-east-1.
+Need to specify the region at the run time eg:us-east-1.
 
 You will get the ssh key into wikimedia file. You can access the application at http://{publicip}:30163/wiki
