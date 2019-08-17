@@ -101,7 +101,7 @@ resource "aws_security_group" "nodeport" {
     ingress {
       from_port                 = 30163
       to_port                   = 30163
-      protocol                  = "UDP"
+      protocol                  = "TCP"
       cidr_blocks               = ["0.0.0.0/0"]
     }
 

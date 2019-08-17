@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mariadb-service
+  labels:
+    app: wikimedia-db
+    type: database
+spec:
+  selector:
+    app: wikimedia-db
+    type: database
+  ports:
+  - port: 3306
+    targetPort: db-port
+  type: ClusterIP 
