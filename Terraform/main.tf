@@ -166,8 +166,8 @@ resource "aws_instance" "web" {
       "sudo minikube start --vm-driver=none",
       "sleep 30",
       "sudo apt-get install git -y",
-      "sudo git clone https://github.com/Anurag-30/MediaWiki.git && cd MediaWiki && cd kubernetes && sudo kubectl create -f secrets.yml -f mariadb-deployment.yaml -f mariadb-svc.yaml",
-      "sudo kubectl create -f app-deployment.yml -f web-service.yaml"
+      "sudo git clone https://github.com/Anurag-30/MediaWiki.git && cd MediaWiki && cd kubernetes && sudo kubectl create -f secrets.yaml -f mariadb-deployment.yaml -f mariadb-svc.yaml",
+      "sudo kubectl create -f app-deployment.yaml -f web-service.yaml"
 
     ]
   }
